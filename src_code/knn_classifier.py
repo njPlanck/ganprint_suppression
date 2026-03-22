@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import VarianceThreshold
 
 # === Load and prepare data 
-df = pd.read_csv("/home/chinasa/python_projects/auto_encoder/outputs/csvs/idiap/noisy/dist_features_01_10.csv")
+df = pd.read_csv("/home/chinasa/python_projects/auto_encoder/outputs/csvs/plus/noisy/star_features_01_10.csv")
 
 # Ensure 'label' column exists and contains expected values
 if 'label' not in df.columns:

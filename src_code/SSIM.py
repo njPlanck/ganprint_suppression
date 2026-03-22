@@ -49,13 +49,11 @@ def compute_ssim_for_folders(reference_folder, compare_folder):
 def smooth_curve(y, window_size=1):
     return np.convolve(y, np.ones(window_size)/window_size, mode='same')
 
-reference_folder = r"C:/Users/User/Desktop/Work/MediaSecurity/src_code/images/synthetic/idiap/starGAN"
+reference_folder = r"/home/chinasa/python_projects/denoising/images/idiap/synthetic/cycleGAN"
 
 
 attack_folders = {
-    "Mean Attack (s = 0.5)": r"C:/Users/User/Desktop/Work/MediaSecurity/src_code/mean_output_05/synthetic_attacked/idiap/starGAN",
-    "Peak Attack": r"C:/Users/User/Desktop/Work/MediaSecurity/src_code/peak_output/synthetic_attacked/idiap/starGAN",
-    "Lasso Attack": r"C:/Users/User/Desktop/Work/MediaSecurity/src_code/lasso_output/synthetic_attacked/idiap/starGAN"
+    "IDIAP cycleGAN": r"/home/chinasa/python_projects/auto_encoder/outputs/images/idiap2/cycleGAN"
 }
 
 
@@ -94,11 +92,11 @@ for attack_name, (files, scores, avg) in all_ssim_data.items():
     smoothed = smooth_curve(scores, window_size=5)
     plt.plot(smoothed, linewidth=2, marker='', label=f"{attack_name} (avg: {avg:.4f})")
 
-plt.title('SSIM Scores for Attacks on StarGAN Images', fontsize=16, fontweight='bold')
+plt.title('SSIM Scores for Denoised on cycleGAN Images', fontsize=16, fontweight='bold')
 plt.xlabel('Image Index', fontsize=12)
 plt.ylabel('SSIM Score', fontsize=12)
 plt.ylim(0, 1.05)
 plt.legend(fontsize=11)
 plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
-plt.show()
+plt.savefig("idiapcycle.png")
