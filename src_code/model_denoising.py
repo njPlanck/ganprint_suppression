@@ -7,9 +7,10 @@ from torchvision.utils import save_image
 from PIL import Image
 from auto_encoder import FingerprintDenoisingAE
 
+
 model_path = "/home/chinasa/python_projects/auto_encoder/outputs/scut_fingerprint_denoiser.pth"
-input_root = "/home/chinasa/python_projects/denoising/images/scut/synthetic/"
-output_root = "/home/chinasa/python_projects/auto_encoder/outputs/images/scut/"
+input_root = "/home/chinasa/python_projects/pad_dataset/scut/synthetic/starGAN"
+output_root = "/home/chinasa/python_projects/auto_encoder/outputs/images/scut_fft/starGAN"
 
 use_gpu = torch.cuda.is_available()
 device = torch.device("cuda" if use_gpu else "cpu")

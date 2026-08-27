@@ -3,8 +3,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-
-
 class FingerprintDenoisingAE(nn.Module):
     def __init__(self):
         super().__init__()
@@ -38,19 +36,25 @@ class FingerprintDenoisingAE(nn.Module):
         
         # Bottleneck(Spatial)
         self.bottleneck = nn.Sequential(
-            nn.Conv2d(256, 128, 1, padding=1, bias=False), # Context aggregation
+            # FIX: padding=0 for kernel_size=1
+            nn.Conv2d(256, 128, 1, padding=0, bias=False), 
             nn.BatchNorm2d(128),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(128, 64, 1, padding=1, bias=False), # Context aggregation
+            
+            nn.Conv2d(128, 64, 1, padding=0, bias=False), 
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(64, 64, 3, padding=1, bias=False), # Context aggregation
+            
+            # Keep padding=1 here because kernel_size=3
+            nn.Conv2d(64, 64, 3, padding=1, bias=False), 
             nn.BatchNorm2d(64),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(64, 128, 1, padding=1, bias=False), # Context aggregation
+            
+            nn.Conv2d(64, 128, 1, padding=0, bias=False), 
             nn.BatchNorm2d(128),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Conv2d(128, 256, 1, padding=1, bias=False), # Context aggregation
+            
+            nn.Conv2d(128, 256, 1, padding=0, bias=False), 
             nn.BatchNorm2d(256),
             nn.LeakyReLU(0.2, inplace=True),
         )
@@ -93,10 +97,8 @@ class FingerprintDenoisingAE(nn.Module):
         x = self.bottleneck(x)
         x = self.decoder(x)
         
-        # Handle strict dimension matching for odd input sizes (665x220)
+        # Handle strict dimension matching for odd input sizes (e.g., 665x220)
         if x.size(2) != target_h or x.size(3) != target_w:
             x = F.interpolate(x, size=(target_h, target_w), mode='bilinear', align_corners=False)
             
         return x
-    
-
