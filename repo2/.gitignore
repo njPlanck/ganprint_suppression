@@ -1,0 +1,18 @@
+_pycache__/
+*.pyc
+
+# Accidental command files
+"eval \"$(ssh-agent -s)\""
+"eval \"$(ssh-agent -s)\".pub"
+outputs/ssmbottleneck_autoencoder.pth
+outputs/images/
+outputs/samples/
+outputs/plus_fingerprint_denoiser.pth
+outputs/scut_fingerprint_denoiser.pth
+outputs/scut_fingerprint_denoiser2.pth
+outputs/fingerprint_denoiser.pth
+src_code/haralick_feat_ext.py
+src_code/SSIM.py
+outputs/samples_denoised/
+outputs_impainting/
+requirements.txt
