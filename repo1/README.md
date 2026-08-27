@@ -1,0 +1,5 @@
+# DCT-Based GAN Model Fingerprint Extraction
+
+With this approach, we apply the methods proposed by Wesselkamp et al for misleading deepfake detection to our finger-vein data. In the <a href="https://doi.org/10.48550/arXiv.2205.12543">paper</a> four different methods were proposed for extraction of GAN fingerprints namely, lowpass filtering attack, mean spectrum attack, frequency peak attak and regression weights attacks. But as we have already seen <a href="https://github.com/njPlanck/Spatial-Filtering-----GAN-Model-Fingerprint-Extraction">here</a> the low pass filtering attack method is not so successful in removing the model fingerprints, as it only targets the high frequency components and to increase the strength of its filtering would lead to severe distortion of the images. This is defeats the purpose in security design, as the overall goal is to model attacks that are imperceptible to both humans and machines. As a result, we would consider the latter three methods; mean spectrum attacks, frequency peak attack and regression weights attacks.
+
+These methods leverage on the compact nature of the DCT to isolate these artifacts for easy removal.
