@@ -1,0 +1,11 @@
+venv/
+images/
+output/
+model_denoising.py
+model_training.py
+wavelet.py
+denoising_autoencoder.keras
+fft.py
+wavelet_denoising.py
+
+
