@@ -28,17 +28,11 @@ def compute_image_spectrum(image_path, target_shape=None, log_scale=True):
 
 
 def create_adaptive_filter(mean_real_spectrum, synth_spectrum, num_stds=2.0):
-    """
-    Subtracts synthetic spectrum from the mean real spectrum to compute the difference,
-    then applies adaptive thresholding to form a binary filter mask.
-    """
     if mean_real_spectrum.shape != synth_spectrum.shape:
         raise ValueError(f"Shape mismatch: Mean {mean_real_spectrum.shape} vs Synth {synth_spectrum.shape}")
 
-    # 1. Subtract synthetic FFT from the mean real spectrum
     difference_map = np.maximum(synth_spectrum - mean_real_spectrum, 0)
 
-    # 2. Compute adaptive threshold based on the difference map
     diff_mean = np.mean(difference_map)
     diff_std = np.std(difference_map)
     adaptive_threshold = diff_mean + (num_stds * diff_std)
@@ -46,12 +40,30 @@ def create_adaptive_filter(mean_real_spectrum, synth_spectrum, num_stds=2.0):
     # 3. Form the filter (mask) where the difference exceeds the threshold
     filter_mask = (difference_map > adaptive_threshold).astype(np.float32)
 
+    # NEW: Protect the critical central low-frequencies from being filtered
+    center_y, center_x = filter_mask.shape[0] // 2, filter_mask.shape[1] // 2
+    radius = 15  # Adjust this radius if the central hole needs to be larger
+
+    Y, X = np.ogrid[:filter_mask.shape[0], :filter_mask.shape[1]]
+    dist_from_center = np.sqrt((X - center_x)**2 + (Y - center_y)**2)
+    
+    # Force the core structure area to 0 (no filtering)
+    filter_mask[dist_from_center <= radius] = 0
+
+    # 4. Apply morphological dilation
+    kernel = np.ones((5, 5), np.uint8)
+    filter_mask = cv2.dilate(filter_mask, kernel, iterations=1)
+
+    # NEW: Apply a Gaussian blur to soften the mask edges
+    # This prevents sheer drops to 0, eliminating ringing in the final image
+    filter_mask = cv2.GaussianBlur(filter_mask, (11, 11), 7.0)
+
     return difference_map, filter_mask, adaptive_threshold
 
 
 def apply_filter_to_synthetic(synth_spectrum, filter_mask):
     """Applies the generated adaptive filter to the synthetic magnitude spectrum."""
-    filtered_spectrum = synth_spectrum * (1 - (1.3 * filter_mask))
+    filtered_spectrum = synth_spectrum * (1 - (1.0 * filter_mask))
     return filtered_spectrum
 
 

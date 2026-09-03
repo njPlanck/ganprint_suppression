@@ -5,6 +5,7 @@ import pandas as pd
 import glob
 from tqdm import tqdm
 
+
 # Compute Fourier-based band energy features
 def feature_vector(image, num_bands=30, slice_range=(0, 30)):
     fft = np.fft.fft2(image)
@@ -47,9 +48,10 @@ def load_images_and_extract_features(file_paths, label, num_bands=30, slice_rang
     return data
 # Main execution
 if __name__ == "__main__":
-    real_folder = glob.glob(r'images/scut/genuine/**/*.bmp', recursive=True)
-    fake_folder = glob.glob(r'images/scut/spoofed/**/*.bmp', recursive=True)
-    synthetic_folder = glob.glob(r'output/denoised_scut/starGAN/nlm/*.png',recursive=True)  # Adjust path
+    real_folder = glob.glob(r'/home/chinasa/python_projects/pad_dataset/scut/genuine/**/*.bmp', recursive=True)
+    fake_folder = glob.glob(r'/home/chinasa/python_projects/pad_dataset/scut/spoofed/**/*.bmp', recursive=True)
+    synthetic_folder = glob.glob(r'/home/chinasa/python_projects/pad_dataset/scut/synthetic/dritGAN/*.png',recursive=True)
+    
 
     data_real = load_images_and_extract_features(real_folder, label=1)
     data_fake = load_images_and_extract_features(fake_folder, label=0)
@@ -58,22 +60,22 @@ if __name__ == "__main__":
     combined_data = data_real + data_fake + data_synthetic
     df = pd.DataFrame(combined_data)
 
-    os.makedirs("output_csvs", exist_ok=True)
-    df.to_csv("output_csvs/plus/features_all.csv", index=False)
+    os.makedirs("/home/chinasa/python_projects/ganprint_removal/outputs/csvs", exist_ok=True)
+    #df.to_csv("/home/chinasa/python_projects/auto_encoder/outputs/csvs/scut/features_all.csv", index=False)
 
     print("DataFrame columns:", df.columns.tolist())
     print("First few rows:\n", df.head())
 
     df_subset1 = df[["label"] + [f"feature_{i}" for i in range(30)]]
-    df_subset1.to_csv("output_csvs/scut/nlm/star_features_01_30.csv", index=False)
+    df_subset1.to_csv("/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/drit_features_01_30.csv", index=False)
 
     df_subset2 = df[["label"] + [f"feature_{i}" for i in range(10)]]
-    df_subset2.to_csv("output_csvs/scut/nlm/star_features_01_10.csv", index=False)
+    df_subset2.to_csv("/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/drit_features_01_10.csv", index=False)
 
     df_subset3 = df[["label"] + [f"feature_{i}" for i in range(10, 20)]]
-    df_subset3.to_csv("output_csvs/scut/nlm/star_features_11_20.csv", index=False)
+    df_subset3.to_csv("/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/drit_features_11_20.csv", index=False)
 
     df_subset4 = df[["label"] + [f"feature_{i}" for i in range(20, 30)]]
-    df_subset4.to_csv("output_csvs/scut/nlm/star_features_21_30.csv", index=False)
+    df_subset4.to_csv("/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/drit_features_21_30.csv", index=False)
 
     print("Feature extraction and export completed.")
