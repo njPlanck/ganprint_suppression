@@ -66,7 +66,7 @@ def plot_fft_comparison(real_path, synthetic_path, denoised_path):
     plt.tight_layout()
     
     # Save the plot to your outputs folder
-    save_path = "fft_comparison_denoised_scut.png"
+    save_path = "fft_comparison_denoised_inv_scut.png"
     plt.savefig(save_path, dpi=300)
     print(f"Plot saved successfully to {save_path}")
     
@@ -81,6 +81,6 @@ if __name__ == "__main__":
    
     PATH_REAL = "/home/chinasa/python_projects/pad_dataset/scut/spoofed/001/1_1_0_2_3.bmp"
     PATH_SYNTHETIC = "/home/chinasa/python_projects/pad_dataset/scut/synthetic/cycleGAN/001-1_1_1_1_5.png"
-    PATH_DENOISED = "/home/chinasa/python_projects/auto_encoder/outputs/images/scut_fft/cycleGAN/001-1_1_1_1_5.png"
+    PATH_DENOISED = "/home/chinasa/python_projects/ganprint_removal/outputs/images/inverse_filtering/scut/cycleGAN_denoised/001-1_1_1_1_5.png"
     
     plot_fft_comparison(PATH_REAL, PATH_SYNTHETIC, PATH_DENOISED)
