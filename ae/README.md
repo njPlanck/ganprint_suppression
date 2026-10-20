@@ -1,23 +1,114 @@
-# Using Auto-Encoder To Extracting Or Suppress GAN Model Fingerprints
-Our work here is to train an autoencoder to  extract or suppress model fingerprints from synthetic images.
-In the Presentation Attack Detection(PAD) system, we were able to confirm the presence of artifacts in GAN generated finger-vein images. We suspect these negatively affected our classifier trained on the fourier features (energy bands), as the real image data were progressively replaced and augumented with synthetic data. In other words, the classifier learned more to the embedded artifacts in the frequency domain of the synthetic data than the spatial structural similarities of these synthetic images to the real ones.
+# Autoencoder-Based GAN Fingerprint Removal and Addition
 
-This was problematic because even though the classifier could distinguish real and synthetic samples, it failed to discriminate bonafide and spoofed samples. Earlier we had tried to remove these artifacts using spatial filtering technigues by treating these model fingerprints as Photo Response Non-Uniformity(PRNU) pattern noise. But this has not been very helpful. It is observed these filters only captured the high frequency noise and ignored the low frequency components, such that suppression was minimal and not enough to effectively fool the classifier during detection.
+This subproject explores convolutional autoencoders as a way to study and manipulate
+model fingerprints in GAN-generated finger-vein images. The motivation comes from
+presentation-attack detection (PAD): synthetic-image artifacts can dominate frequency
+features and affect how a PAD classifier behaves when synthetic data are used to
+augment or replace real training samples.
 
+The autoencoder is intended to learn image structure through an encoder, a compact
+latent representation, and a decoder. Because learned reconstruction can behave like
+a nonlinear denoiser, the project investigates two complementary training strategies:
+one for **removing** GAN fingerprints and one for **adding** them.
 
-# Encoder Structure 
+## Two training strategies
 
-The design of the encoder structure leverages on the convolutional autoencoder structure for its feature extraction capabilites to denoise GAN generated finger vein images. Like Neves et al hypothesizes, these fingerprints can be removed by this autoencoder, which acts as a non-linear low-pass filter.
+### 1. Train on real images, apply to synthetic images: fingerprint removal
 
-During training, the real image samples are fed into the network, and a 3 by 3 kernel is used to extract features before downsampling at every layer of the network on the encoder section. To create the bottleneck, the window size is then reduced and capture the localised featured of the downsampled images in the latent space. These latent features are then reconstructed on the decoder side by feature expansion through upsampling. Here the model learns the unique distribution in real images. 
+Train the autoencoder using real, bona fide images and a reconstruction objective. The
+model learns the image patterns represented in the real-image training set. Apply this
+model to GAN-generated images to reconstruct them while suppressing synthetic
+fingerprint artifacts that are not represented by the real-image distribution.
 
-![encoderstrcutre](imgs/image.png)
+**Goal:** reduce GAN-specific artifacts in synthetic images while preserving their
+visible finger-vein structure. The resulting images can then be compared in the
+frequency domain or used in downstream PAD experiments.
 
-# Input And Output From The Encoder Structure
+### 2. Train on synthetic images, transfer artifacts to real images: fingerprint addition
 
-![ioencoder](imgs/image1.png)
+Train the autoencoder on synthetic images so that it learns their recurring structures
+and artifacts. Use the learned artifact representation in a subsequent transfer or
+inpainting step to add those artifacts to real images.
 
-# Observation
-It is obvious that the autoencoder removes the visible periodic patterns seen in the sample fingervein image with minimal distortion in . So this is consistent with the assumption that these artifacts live in the high frequencies. And intuitively a low pass filtering (a non-linear lowpass in our case), suppressing these noise should make the sythetic samples look like real samples.
+**Goal:** create real-looking images with controlled GAN-like fingerprints, enabling
+experiments on how synthetic artifacts affect image analysis and PAD systems.
 
-To verify this, the fourier features from the denoised samples from the PLUS, SCUT and IDIAP datasets are used to train our PAD system which evaluates the effect of augmentation of real Presentation Attack Instruments( real PAIs) and with synthetic Presentation Attack Instruments(syn PAIs), and also the complete replacement of these real PAIs with syn PAIs. 
+This addition direction is conceptually distinct from simply passing a real image
+through an ordinary autoencoder. The artifact must be isolated or otherwise represented
+and then transferred into the real image; reconstruction alone does not guarantee that
+the model has separated the fingerprint from image content.
+
+## Model
+
+The convolutional autoencoder in `src_code/auto_encoder.py` uses four encoder stages
+with convolution, normalization, nonlinear activation, and downsampling. A convolutional
+bottleneck processes the latent features; the decoder upsamples and reconstructs a
+single-channel image. The output is resized when necessary to match the input
+dimensions.
+
+![Autoencoder architecture](imgs/image.png)
+
+![Example autoencoder input and output](imgs/image1.png)
+
+The training scripts use grayscale images normalized to `[-1, 1]` and split the
+configured image collection into training and validation sets. They optimize
+reconstruction losses that combine pixel-level and structural similarity; one variant
+also includes a spectral loss. Model checkpoints and sample reconstructions are saved
+to configured output directories.
+
+## Code map
+
+- `src_code/auto_encoder.py` — convolutional autoencoder architecture.
+- `src_code/model_training.py` — reconstruction training with pixel, structural, and
+  spectral loss components.
+- `src_code/model_training_spatial.py` — reconstruction training with pixel and
+  structural similarity losses.
+- `src_code/model_denoising.py` — loads a trained checkpoint and applies it to a
+  configured image folder, currently set up as a synthetic-image denoising example.
+- `src_code/disp_fft.py` — compares real, synthetic, and processed images in the
+  Fourier domain.
+- `src_code/fourier_feature_extraction.py` and `src_code/classifier.py` — extract
+  frequency features and evaluate PAD training scenarios.
+
+## Running experiments
+
+The scripts currently contain machine-specific dataset, checkpoint, and output paths.
+Before running them, update those paths to your local data and create the required
+output directories.
+
+1. Install the dependencies used by the selected scripts, including PyTorch,
+   torchvision, Pillow, and `pytorch-msssim`.
+2. Configure the training data and checkpoint/output paths in the selected script under
+   `src_code/`.
+3. Train a model, for example:
+
+   ```bash
+   python src_code/model_training.py
+   ```
+
+   Or use the spatial-loss variant:
+
+   ```bash
+   python src_code/model_training_spatial.py
+   ```
+
+4. To apply a trained model to images, update the checkpoint, input, and output paths
+   in `src_code/model_denoising.py`, then run:
+
+   ```bash
+   python src_code/model_denoising.py
+   ```
+
+The supplied denoising script demonstrates inference on synthetic images. The
+synthetic-trained artifact-addition direction requires an artifact-transfer or
+inpainting step; the reconstruction training scripts alone do not implement that
+transfer automatically.
+
+## Evaluation
+
+Compare the original and processed images for both visual structure and frequency
+content. The feature-extraction and classifier scripts can then be used to investigate
+how processing affects PAD performance when synthetic samples are added to, or used to
+replace, real samples. Interpret results alongside image-quality measures so that
+artifact suppression or addition is not mistaken for a useful transformation if it
+also substantially distorts the underlying image.
