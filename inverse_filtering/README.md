@@ -35,14 +35,6 @@ modified by a factor of `-0.5`; this is stronger than simply zeroing or attenuat
 them. The mask threshold and this multiplier should be considered when interpreting
 results.
 
-## Scripts
-
-- [`src_code/noise_estimation.py`](src_code/noise_estimation.py) — estimates and plots
-  a mean FFT magnitude spectrum from a directory of images.
-- [`src_code/adaptive_filtering.py`](src_code/adaptive_filtering.py) — creates an
-  adaptive frequency mask for each input image and saves the inverse-FFT
-  reconstruction.
-
 The existing filtering script loads its reference array into a variable named
 `mean_real_spectrum`; use a reference spectrum with the intended meaning for your
 experiment. The reference and target spectra must use the same image scaling and
