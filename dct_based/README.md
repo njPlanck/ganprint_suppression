@@ -37,23 +37,21 @@ D_{\text{attacked}} = D_{\text{synthetic}} -
                       s F_{\text{mean}}
 $$
 
-The strength \(s\) controls the amount of modification. See
-[`src_code/fingerprint.py`](src_code/fingerprint.py).
+The strength \(s\) controls the amount of modification.
 
 ### Frequency-peak attack
 
 This variant computes log-magnitude DCT spectra to emphasize periodic peaks, estimates
 the difference between synthetic and genuine mean spectra, and converts that difference
 back from the log domain. The scaled fingerprint is applied element-wise to the
-original, non-log DCT coefficients. See
-[`src_code/peak_fingerprint.py`](src_code/peak_fingerprint.py).
+original, non-log DCT coefficients.
 
 ### Regression-weight attack
 
 This variant flattens image DCTs into feature vectors and trains a LASSO regression
 model to distinguish genuine from synthetic samples. The learned coefficients are
 reshaped to the DCT dimensions and used as a fingerprint mask when modifying
-coefficients. See [`src_code/lasso_fingerprint.py`](src_code/lasso_fingerprint.py).
+coefficients. 
 
 ## Evaluation described in the project report
 
@@ -74,16 +72,6 @@ reported as more susceptible in some settings. Image similarity and PAD performa
 also do not always move together: high SSIM can mean less visible change without
 necessarily improving PAD accuracy.
 
-## Code map
-
-- [`src_code/fingerprint.py`](src_code/fingerprint.py) — mean-spectrum fingerprint
-  estimation and removal.
-- [`src_code/peak_fingerprint.py`](src_code/peak_fingerprint.py) — frequency-peak
-  fingerprint estimation and removal.
-- [`src_code/lasso_fingerprint.py`](src_code/lasso_fingerprint.py) — LASSO
-  regression-weight fingerprint estimation and removal.
-- [`src_code/knn_classifier.py`](src_code/knn_classifier.py) — evaluates PAD features
-  using K-nearest neighbors and reports accuracy, APCER, BPCER, and ACER.
 
 ## Running the scripts
 
