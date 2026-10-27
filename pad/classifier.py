@@ -11,8 +11,8 @@ from sklearn.feature_selection import VarianceThreshold
 gan_files = {
     "CycleGAN": "/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/cycle_features_21_30.csv",
     "DistanceGAN": "/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/dist_features_21_30.csv",
-    "StarGAN": "/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/star_features_21_30.csv",
     "DRIT": "/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/drit_features_21_30.csv",
+    "StarGAN": "/home/chinasa/python_projects/ganprint_removal/outputs/csvs/default/star_features_21_30.csv",
 }
 
 output_excel_name = "/home/chinasa/python_projects/ganprint_removal/outputs/excel/scut_fft_high_noisy_Results1.xlsx"
